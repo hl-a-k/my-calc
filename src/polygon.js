@@ -10,6 +10,54 @@ var activeShape = false;
 var canvas
 let line;
 
+function drawOutletRec(points, canvas) {
+    let { x: x0, y: y0 } = points[0];
+    let { x: x1, y: y1 } = points[0];
+
+    for (let i = 1; i < points.length; i++) {
+        let { x: tx, y: ty } = points[i];
+        x0 = Math.min(x0, tx);
+        x1 = Math.max(x1, tx);
+
+        y0 = Math.min(y0, ty);
+        y1 = Math.max(y1, ty);
+    }
+
+    let width = x1 - x0;
+    let height = y1 - y0;
+
+    var rect = new fabric.Rect({
+        left: x0,
+        top: y0,
+        originX: 'left',
+        originY: 'top',
+        width,
+        height,
+        fill: 'rgba(100,10,10,0.5)',
+        transparentCorners: false
+    });
+
+    let rw = 10;
+    let rh = 20;
+
+    for (let i = 0; i < Math.floor( width / rw); i++)
+        for (let j = 0; j < Math.floor( height / rh); j++) {
+            var rect = new fabric.Rect({
+                left: x0 + i * rw,
+                top: y0 + j * rh,
+                originX: 'left',
+                originY: 'top',
+                width:  rw,
+                height: rh,
+                fill: 'rgba(1,1,1,0.5)',
+                transparentCorners: false
+            });
+            canvas.add(rect)
+
+        }
+    canvas.add(rect)
+}
+
 var prototypefabric = new function (ref) {
     this.initCanvas = function (ref) {
         canvas = window._canvas = new fabric.Canvas(ref);
@@ -136,7 +184,6 @@ prototypefabric.polygon = {
     },
     generatePolygon: function (pointArray) {
         var points = new Array();
-        console.log(pointArray)
         pointArray.forEach(point => {
             points.push({
                 x: point.left,
@@ -158,6 +205,8 @@ prototypefabric.polygon = {
             hasControls: false
         });
         canvas.add(polygon);
+
+        drawOutletRec(points, canvas)
 
         activeLine = null;
         activeShape = null;

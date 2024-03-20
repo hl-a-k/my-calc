@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import prototypefabric from './polygon'
+import prototypefabric from './polygon';
+import { Button } from 'ant-design-vue';
 
 const canvasRef = ref(null);
 
@@ -12,7 +13,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <button v-on:click="prototypefabric.polygon.drawPolygon">draw</button>
+    <Button v-on:click="prototypefabric.polygon.drawPolygon">draw</Button>
     <canvas width="400" height="400" ref="canvasRef" style="border: 1px solid #ccc;"></canvas>
   </div>
 
