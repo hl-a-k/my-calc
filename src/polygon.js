@@ -1,5 +1,5 @@
 import { fabric } from 'fabric';
-import {Polygon, Box, point, Relations} from '@flatten-js/core';
+import { Polygon, Box, point, Relations } from '@flatten-js/core';
 
 var min = 99;
 var max = 999999;
@@ -11,9 +11,25 @@ var activeShape = false;
 var canvas
 let line;
 
+function count(x0, y0, x1, y1, dx, dy, rw, rh, roof) {
+    let x = x0 - dx;
+    let y = y0 - dy;
+    let cnt = 0;
+    for (let i = 0; x + (i + 1) * rw <= x1; i++)
+        for (let j = 0; y + (j + 1) * rh <= y1; j++) {
+            let _rec = new Box(x + i * rw, y + j * rh, x + i * rw + rw, y + j * rh + rh)
+            if (Relations.inside(_rec, roof)) {
+                cnt++
+            }
+        }
+
+    return cnt;
+
+}
+
 function drawOutletRec(points, canvas) {
     let ps = []
-    for (let {x, y} of points) {
+    for (let { x, y } of points) {
         ps.push(point(x, y))
     }
     let roof = new Polygon(ps)
@@ -29,45 +45,48 @@ function drawOutletRec(points, canvas) {
         y0 = Math.min(y0, ty);
         y1 = Math.max(y1, ty);
     }
-
-    let width = x1 - x0;
-    let height = y1 - y0;
-
-    var rect = new fabric.Rect({
-        left: x0,
-        top: y0,
-        originX: 'left',
-        originY: 'top',
-        width,
-        height,
-        fill: 'rgba(100,10,10,0.5)',
-        transparentCorners: false
-    });
-
     let rw = 10;
     let rh = 20;
 
-    for (let i = 0; i < Math.floor( width / rw); i++)
-        for (let j = 0; j < Math.floor( height / rh); j++) {
-            let _rec = new Box(x0 + i * rw, y0 + j * rh, x0 + i * rw + rw, y0 + j * rh + rh)
-            let fill =  'rgba(100,100,100,0.5)'
-            if (Relations.inside(_rec, roof)) {
-                fill = 'rgba(1,1,1,0.5)'
-            }
+    let mx_cnt = 0;
+    let best_x = x0;
+    let best_y = y0;
 
-            var rect = new fabric.Rect({
-                left: x0 + i * rw,
-                top: y0 + j * rh,
-                originX: 'left',
-                originY: 'top',
-                width:  rw,
-                height: rh,
-                fill,
-                transparentCorners: false
-            });
-            canvas.add(rect)
+    for (let dx = 0; dx < rw; dx++) {
+        for (let dy = 0; dy < rh; dy++) {
+            let cnt = count(x0, y0, x1, y1, dx, dy, rw, rh, roof);
+            if(dx == 0 && dy == 0) {
+                console.log(cnt)
+            }
+            if (cnt > mx_cnt) {
+                mx_cnt = cnt;
+                best_x = x0 - dx;
+                best_y = y0 - dy;
+            }
         }
-    canvas.add(rect)
+    }
+
+    console.log(best_x, best_y, x0, y0, mx_cnt)
+
+    for (let i = 0; best_x + (i + 1) * rw <= x1; i++)
+        for (let j = 0; best_y + (j + 1) * rh <= y1; j++) {
+            let _rec = new Box(best_x + i * rw, best_y + j * rh, best_x + i * rw + rw, best_y + j * rh + rh)
+            
+            if (Relations.inside(_rec, roof)) {
+                let fill = 'rgba(1,1,1,0.5)'
+                var rect = new fabric.Rect({
+                    left: best_x + i * rw,
+                    top: best_y + j * rh,
+                    originX: 'left',
+                    originY: 'top',
+                    width: rw,
+                    height: rh,
+                    fill,
+                    transparentCorners: false
+                });
+                canvas.add(rect)
+            }
+        }
 }
 
 var prototypefabric = new function (ref) {
