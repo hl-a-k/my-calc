@@ -1,4 +1,5 @@
 import { fabric } from 'fabric';
+import {Polygon, Box, point, Relations} from '@flatten-js/core';
 
 var min = 99;
 var max = 999999;
@@ -11,6 +12,12 @@ var canvas
 let line;
 
 function drawOutletRec(points, canvas) {
+    let ps = []
+    for (let {x, y} of points) {
+        ps.push(point(x, y))
+    }
+    let roof = new Polygon(ps)
+
     let { x: x0, y: y0 } = points[0];
     let { x: x1, y: y1 } = points[0];
 
@@ -42,6 +49,12 @@ function drawOutletRec(points, canvas) {
 
     for (let i = 0; i < Math.floor( width / rw); i++)
         for (let j = 0; j < Math.floor( height / rh); j++) {
+            let _rec = new Box(x0 + i * rw, y0 + j * rh, x0 + i * rw + rw, y0 + j * rh + rh)
+            let fill =  'rgba(100,100,100,0.5)'
+            if (Relations.inside(_rec, roof)) {
+                fill = 'rgba(1,1,1,0.5)'
+            }
+
             var rect = new fabric.Rect({
                 left: x0 + i * rw,
                 top: y0 + j * rh,
@@ -49,11 +62,10 @@ function drawOutletRec(points, canvas) {
                 originY: 'top',
                 width:  rw,
                 height: rh,
-                fill: 'rgba(1,1,1,0.5)',
+                fill,
                 transparentCorners: false
             });
             canvas.add(rect)
-
         }
     canvas.add(rect)
 }
