@@ -27,7 +27,7 @@ function count(x0, y0, x1, y1, dx, dy, rw, rh, roof) {
 
 }
 
-function drawOutletRec(points, canvas) {
+function layout(points, canvas) {
     let ps = []
     for (let { x, y } of points) {
         ps.push(point(x, y))
@@ -55,9 +55,6 @@ function drawOutletRec(points, canvas) {
     for (let dx = 0; dx < rw; dx++) {
         for (let dy = 0; dy < rh; dy++) {
             let cnt = count(x0, y0, x1, y1, dx, dy, rw, rh, roof);
-            if(dx == 0 && dy == 0) {
-                console.log(cnt)
-            }
             if (cnt > mx_cnt) {
                 mx_cnt = cnt;
                 best_x = x0 - dx;
@@ -230,14 +227,14 @@ prototypefabric.polygon = {
         var polygon = new fabric.Polygon(points, {
             stroke: '#333333',
             strokeWidth: 0.5,
-            fill: 'red',
+            fill: '#798f1a',
             opacity: 1,
             hasBorders: false,
             hasControls: false
         });
         canvas.add(polygon);
 
-        drawOutletRec(points, canvas)
+        layout(points, canvas)
 
         activeLine = null;
         activeShape = null;
