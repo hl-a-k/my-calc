@@ -11,6 +11,9 @@ var activeShape = false;
 var canvas
 let line;
 
+var roof = null;
+var blocks = [];
+
 function count(x0, y0, x1, y1, dx, dy, rw, rh, roof) {
     let x = x0 - dx;
     let y = y0 - dy;
@@ -86,7 +89,7 @@ function layout(points, canvas) {
         }
 }
 
-var prototypefabric = new function (ref) {
+var prototypefabric = new function () {
     this.initCanvas = function (ref) {
         canvas = window._canvas = new fabric.Canvas(ref);
 
@@ -232,14 +235,18 @@ prototypefabric.polygon = {
             hasBorders: false,
             hasControls: false
         });
-        canvas.add(polygon);
-
-        layout(points, canvas)
+        canvas.add(polygon);        
 
         activeLine = null;
         activeShape = null;
         polygonMode = false;
         canvas.selection = true;
+
+
+        setTimeout(() => {
+            layout(points, canvas)
+        }, 0.1);
+        
     }
 };
 
